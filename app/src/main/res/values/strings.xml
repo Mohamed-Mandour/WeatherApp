@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Stormy</string>
+    <string name="network_unavaliable_message">Network is Unavaliable</string>
+    <string name="cloud_cover">CLOUD COVER</string>
+    <string name="_5_56">5.56</string>
+    <string name="visibility">VISIBILITY</string>
+    <string name="_2_5">2.5</string>
+    <string name="wind_speed">WIND SPEED</string>
+    <string name="_1_34">1.34</string>
+    <string name="_7_days">7 DAYS</string>
+    <string name="hourly">HOURLY</string>
+    <string name="_0_88">0.88</string>
+    <string name="humidity">HUMIDITY</string>
+    <string name="_8_88">8.88</string>
+    <string name="stormy_and_raining">Stormy and Raining</string>
+    <string name="holloway_road_london">Holloway Road,London</string>
+    <string name="at7_30_pm">At7:30 PM</string>
+    <string name="_35">35</string>
+    <string name="there_no_data_to_display">there no data to display</string>
+    <string name="no_daily_forecast_data">no_daily_forecast_data</string>
+</resources>
