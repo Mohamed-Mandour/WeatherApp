@@ -45,19 +45,32 @@ public class MainActivity extends AppCompatActivity {
     private Forecast mForecast;
 
 
-    @BindView(R.id.temperatureLabel) TextView mTemperatureLabel;
-    @BindView(R.id.timeLabel) TextView mTimeValue;
-    @BindView(R.id.humidityValue) TextView mHumidityValue;
-    @BindView(R.id.summaryLabel) TextView mSummaryValue;
-    @BindView(R.id.pressureValue) TextView mPressureValue;
-    @BindView(R.id.iconImageView) ImageView mIconImageView;
-    @BindView(R.id.refreshImageView) ImageView mrefreshImageView;
-    @BindView(R.id.progressBar3) ProgressBar mProgressBar;
-    @BindView(R.id.cloudCoverValue) TextView mCloudCoverValue;
-    @BindView(R.id.visibilityValue) TextView mVisibilityValue;
-    @BindView(R.id.windSpeedValue) TextView mWindSpeedValue;
-    @BindView(R.id.windGustValue) TextView mWindGustValue;
-    @BindView(R.id.locationLabel)TextView mLocationLabel;
+    @BindView(R.id.temperatureLabel)
+    TextView mTemperatureLabel;
+    @BindView(R.id.timeLabel)
+    TextView mTimeValue;
+    @BindView(R.id.humidityValue)
+    TextView mHumidityValue;
+    @BindView(R.id.summaryLabel)
+    TextView mSummaryValue;
+    @BindView(R.id.pressureValue)
+    TextView mPressureValue;
+    @BindView(R.id.iconImageView)
+    ImageView mIconImageView;
+    @BindView(R.id.refreshImageView)
+    ImageView mrefreshImageView;
+    @BindView(R.id.progressBar3)
+    ProgressBar mProgressBar;
+    @BindView(R.id.cloudCoverValue)
+    TextView mCloudCoverValue;
+    @BindView(R.id.visibilityValue)
+    TextView mVisibilityValue;
+    @BindView(R.id.windSpeedValue)
+    TextView mWindSpeedValue;
+    @BindView(R.id.windGustValue)
+    TextView mWindGustValue;
+    @BindView(R.id.locationLabel)
+    TextView mLocationLabel;
 
 
     @Override
@@ -79,20 +92,28 @@ public class MainActivity extends AppCompatActivity {
 
         getForecast(latitude, longtude);
     }
-        // request to the weather API to get the data
-        // check first wheather there is network connection or not
-    private void getForecast(double latitude, double longtude) {
-        String apiValue = "e96af2add989d0323c3462b40b50ad3a";
-        String forecastUrl = "https://api.darksky.net/forecast/" +apiValue+ "/"+latitude+","+longtude;
 
-        if(isNetworkAvaliable()) {
+    // request to the weather API to get the data
+    // check first wheather there is network connection or not
+    private void getForecast(double latitude, double longtude) {
+        Log.d(TAG, "getForecast called with " + latitude + "and " + longtude);
+        String apiValue = "a1fca94d101abf452cf8c428d35f5978";
+        String forecastUrl = "https://api.darksky.net/forecast/" + apiValue + "/" + latitude + "," + longtude;
+
+        boolean networkAvailable = isNetworkAvaliable();
+        if (networkAvailable) {
+            Log.d(TAG, "isNetworkAvailable() " + networkAvailable);
             togglerRefersh();
             OkHttpClient client = new OkHttpClient();
+            Log.d(TAG, "client" + client);
             Request request = new Request.Builder().url(forecastUrl).build();
-            Call call = client.newCall(request);
-            call.enqueue(new Callback() {
+            Log.d(TAG, "request " + request.body());
+
+            client.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
+                    Log.d(TAG, "onFailure " + call.isExecuted());
+                    e.printStackTrace();
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -100,20 +121,23 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                 }
+
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
-                     runOnUiThread(new Runnable() {
-                         @Override
-                         public void run() {
-                             togglerRefersh();
-                         }
-                     });
+                    Log.d(TAG, "onResponse" + call);
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            togglerRefersh();
+                        }
+                    });
                     try {
-                        String jsonDate =  response.body().string();
+                        String jsonDate = response.body().string();
                         Log.v(TAG, jsonDate);
                         if (response.isSuccessful()) {
                             mForecast = parseForecastDetails(jsonDate);
-
+                            Log.d(TAG, "mForecast" + mForecast);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -121,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             });
                         } else {
-                             alertUserAboutError();
+                            alertUserAboutError();
                         }
                     } catch (IOException e) {
                         Log.e(TAG, "Exception caugth: " + e);
@@ -131,18 +155,17 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             });
-        }
-        else {
+
+        } else {
             AlertUserAboutNetworkState();
         }
     }
 
     private void togglerRefersh() {
-        if(mProgressBar.getVisibility() == View.INVISIBLE) {
+        if (mProgressBar.getVisibility() == View.INVISIBLE) {
             mProgressBar.setVisibility(View.VISIBLE);
             mrefreshImageView.setVisibility(View.INVISIBLE);
-        }
-        else {
+        } else {
             mProgressBar.setVisibility(View.INVISIBLE);
             mrefreshImageView.setVisibility(View.VISIBLE);
         }
@@ -152,17 +175,16 @@ public class MainActivity extends AppCompatActivity {
     private void update() {
         Current current = mForecast.getCurrent();
 
-        mTemperatureLabel.setText(current.getTemperture()+"");
-        mTimeValue.setText("At "+current.getFormattedTime());
+        mTemperatureLabel.setText(current.getTemperture() + "");
+        mTimeValue.setText("At " + current.getFormattedTime());
         mHumidityValue.setText(current.getHumiditry().toString());
         mLocationLabel.setText(current.getTimeZome());
         mSummaryValue.setText(current.getSummary());
-        mWindGustValue.setText(current.getWindGust()+ "");
-        mWindSpeedValue.setText(current.getWindSpeed()+"");
-        mVisibilityValue.setText(current.getVisibility()+"");
-        mCloudCoverValue.setText(current.getCloudCover()+"");
-        mPressureValue.setText(current.getPreesure() +"");
-
+        mWindGustValue.setText(current.getWindGust() + "");
+        mWindSpeedValue.setText(current.getWindSpeed() + "");
+        mVisibilityValue.setText(current.getVisibility() + "");
+        mCloudCoverValue.setText(current.getCloudCover() + "");
+        mPressureValue.setText(current.getPreesure() + "");
 
 
         Drawable drawble = getResources().getDrawable(current.getIconImage());
@@ -174,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
         ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
         boolean isAvalible = false;
-        if(networkInfo != null && networkInfo.isConnected()){
+        if (networkInfo != null && networkInfo.isConnected()) {
             isAvalible = true;
         }
         return isAvalible;
@@ -184,29 +206,31 @@ public class MainActivity extends AppCompatActivity {
         AlertDialogFragment alertDialogFragment = new AlertDialogFragment();
         alertDialogFragment.show(getFragmentManager(), "error dialog");
     }
+
     private void AlertUserAboutNetworkState() {
         NetworkDialogFragment networkDialogFragment = new NetworkDialogFragment();
         networkDialogFragment.show(getFragmentManager(), "Network Failure");
     }
-    private Forecast parseForecastDetails(String jsonDate) throws JSONException{
+
+    private Forecast parseForecastDetails(String jsonDate) throws JSONException {
 
         Forecast forecast = new Forecast();
-        forecast.setCurrent(getCurrentDetails(jsonDate ));
+        forecast.setCurrent(getCurrentDetails(jsonDate));
         forecast.setHours(getHourlyForecast(jsonDate));
         forecast.setDays(getDailyForecast(jsonDate));
         return forecast;
     }
 
-    private Day[] getDailyForecast(String jsonDate)throws JSONException {
+    private Day[] getDailyForecast(String jsonDate) throws JSONException {
         // create a new json object
         JSONObject forecast = new JSONObject(jsonDate);
         String timeZone = forecast.getString("timezone");
         JSONObject daily = forecast.getJSONObject("daily");
         JSONArray data = daily.getJSONArray("data");
         // create a new daily data array
-        Day [] days = new Day[data.length()];
+        Day[] days = new Day[data.length()];
         // iterate through data json array to populate the data
-        for(int i = 0 ; i < data.length(); i ++){
+        for (int i = 0; i < data.length(); i++) {
             JSONObject jsonDay = data.getJSONObject(i);
             Day day = new Day();
             day.setSummary(jsonDay.getString("summary"));
@@ -220,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
         return days;
     }
 
-    private Hour[] getHourlyForecast(String jsonDate) throws  JSONException{
+    private Hour[] getHourlyForecast(String jsonDate) throws JSONException {
         // get the json object
         JSONObject forecast = new JSONObject(jsonDate);
         String timeZone = forecast.getString("timezone");
@@ -228,11 +252,11 @@ public class MainActivity extends AppCompatActivity {
         JSONObject hourly = forecast.getJSONObject("hourly");
         JSONArray data = hourly.getJSONArray("data");
         // create a new hour data array
-        Hour [] hours = new Hour[data.length()];
+        Hour[] hours = new Hour[data.length()];
         // iterate through data json array to populate the data
-        for(int i = 0; i < data.length() ; i++){
+        for (int i = 0; i < data.length(); i++) {
             JSONObject jsonHour = data.getJSONObject(i);
-            Hour hour =  new Hour();
+            Hour hour = new Hour();
             hour.setSummary(jsonHour.getString("summary"));
             hour.setTemperture(jsonHour.getDouble("temperature"));
             hour.setIcon(jsonHour.getString("icon"));
@@ -240,7 +264,7 @@ public class MainActivity extends AppCompatActivity {
             hour.setTimeZone(timeZone);
             hours[i] = hour;
         }
-            return hours;
+        return hours;
     }
 
 
@@ -268,16 +292,17 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, current.getFormattedTime());
         return current;
     }
+
     @OnClick(R.id.DailyButton)
-    public void startDailyActivity(View view){
-        Intent intent =  new Intent(this , DailyForecastActivity.class);
+    public void startDailyActivity(View view) {
+        Intent intent = new Intent(this, DailyForecastActivity.class);
         intent.putExtra(DALIY_FORECAST, mForecast.getDays());
         startActivity(intent);
     }
 
     @OnClick(R.id.HourlyButton)
-    public void startHourlyActivity(View view){
-        Intent intent =  new Intent(this , HourlyForecastActivity.class);
+    public void startHourlyActivity(View view) {
+        Intent intent = new Intent(this, HourlyForecastActivity.class);
         intent.putExtra(Hourly_FORECAST, mForecast.getHours());
         startActivity(intent);
     }

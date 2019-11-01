@@ -27,7 +27,7 @@ public class HourlyForecastActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         Intent intent = getIntent();
         Parcelable[]  parcelables = intent.getParcelableArrayExtra(MainActivity.Hourly_FORECAST);
-        mHour = Arrays.copyOf(parcelables, parcelables.length,Hour[].class);
+        mHour = Arrays.copyOf(parcelables, parcelables.length, Hour[].class);
 
         HourAdapter adapter =  new HourAdapter(mHour);
         mRecyclerView.setAdapter(adapter);
